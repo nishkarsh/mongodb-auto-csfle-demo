@@ -19,3 +19,4 @@ Note: The class `KeyManager` has helper methods to generate master and local key
 #### Note:
 - The Local Key is saved in `demo.__keyVault`.
 - The Person entity is saved in `encrypt-test.person`.
+- Automatic Client Side Field Level Encryption only works with MongoDB Enterprise Edition.
