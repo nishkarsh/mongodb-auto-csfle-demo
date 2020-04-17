@@ -1,5 +1,8 @@
 # Mongo Automatic Client Side Field Level Encryption (CSFLE)
 
+#### Important
+This application probably wouldn't execute without code change. The instructions are in the comments in the code. It has been explicitly left like this to make sure that the developer understands that the keys have to be generated and then the same keys have to be used for future. It's also importatnt to understand that the master key has to be kept at a secure place (KMS) when implementing this in production application rather than in local filesystem.
+
 ### What is this repository about?
 
 This repository is about the demonstration of Automatic Client Side Field Level Encryption with MongoDB Enterprise Edition and SpringBoot.
