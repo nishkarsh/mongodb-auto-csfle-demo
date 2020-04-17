@@ -3,12 +3,14 @@ package com.intentfilter.mongoencryptdemo.config;
 import com.intentfilter.mongoencryptdemo.models.Person;
 import com.intentfilter.mongoencryptdemo.services.KeyManager;
 import com.mongodb.AutoEncryptionSettings;
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.bson.BsonDocument;
 import org.bson.codecs.UuidCodec;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.schema.MongoJsonSchema;
@@ -16,8 +18,7 @@ import org.springframework.data.mongodb.core.schema.MongoJsonSchema;
 import java.io.IOException;
 import java.util.Map;
 
-import static com.intentfilter.mongoencryptdemo.services.KeyManager.DbStrings.KEY_VAULT_COLLECTION;
-import static com.intentfilter.mongoencryptdemo.services.KeyManager.DbStrings.KEY_VAULT_DB;
+import static com.intentfilter.mongoencryptdemo.services.KeyManager.DbStrings.*;
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static java.util.UUID.fromString;
 import static org.bson.UuidRepresentation.STANDARD;
@@ -28,8 +29,12 @@ import static org.springframework.data.mongodb.core.schema.JsonSchemaProperty.st
 
 @Configuration
 public class MongoConfig {
+    @Value("${spring.data.mongodb.uri}")
+    private String mongoConnectionString;
+
     private KeyManager keyManager;
     private static final String KEY_VAULT_NAMESPACE = KEY_VAULT_DB + "." + KEY_VAULT_COLLECTION;
+    private static final String PERSON_COLLECTION_NAMESPACE = REGULAR_DB + "." + Person.Fields.CollectionName;
 
     public MongoConfig(KeyManager keyManager) {
         this.keyManager = keyManager;
@@ -45,7 +50,7 @@ public class MongoConfig {
         final Map<String, Map<String, Object>> kmsProviders = keyManager.getKmsProviders();
 
         // Generate a local key using master key, this gets saved into local database
-        // final KeyManager.LocalKey localKey = keyManager.generateLocalKeyId(KEY_VAULT_NAMESPACE, kmsProviders);
+        // final KeyManager.LocalKey localKey = keyManager.generateLocalKeyId(KEY_VAULT_NAMESPACE, kmsProviders, mongoConnectionString);
 
         // Use the local key generated here
         KeyManager.LocalKey generatedLocalKey = new KeyManager.LocalKey(fromString("45c545d9-67be-4e1b-b1be-2f8d7e102a61"), null);
@@ -60,6 +65,7 @@ public class MongoConfig {
                 .build();
 
         MongoClientSettings clientSettings = MongoClientSettings.builder()
+                .applyConnectionString(new ConnectionString(mongoConnectionString))
                 .codecRegistry(codecRegistry)
                 .uuidRepresentation(STANDARD)
                 .autoEncryptionSettings(autoEncryptionSettings)
@@ -75,6 +81,6 @@ public class MongoConfig {
                         .keys(localKey.uuidKeyId))
                 .build();
         final BsonDocument document = schema.toDocument().toBsonDocument(BsonDocument.class, codecRegistry).getDocument("$jsonSchema");
-        return Map.of("encrypt-test.person", document);
+        return Map.of(PERSON_COLLECTION_NAMESPACE, document);
     }
 }

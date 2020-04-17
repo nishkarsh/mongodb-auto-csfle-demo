@@ -1,6 +1,7 @@
 package com.intentfilter.mongoencryptdemo.services;
 
 import com.mongodb.ClientEncryptionSettings;
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -43,9 +44,11 @@ public class KeyManager {
         return kmsProviders;
     }
 
-    public LocalKey generateLocalKeyId(String keyVaultNamespace, Map<String, Map<String, Object>> kmsProviders) {
+    public LocalKey generateLocalKeyId(String keyVaultNamespace, Map<String, Map<String, Object>> kmsProviders, String connectionString) {
         ClientEncryptionSettings clientEncryptionSettings = ClientEncryptionSettings.builder()
-                .keyVaultMongoClientSettings(MongoClientSettings.builder().build())
+                .keyVaultMongoClientSettings(MongoClientSettings.builder()
+                        .applyConnectionString(new ConnectionString(connectionString))
+                        .build())
                 .keyVaultNamespace(keyVaultNamespace)
                 .kmsProviders(kmsProviders)
                 .build();
@@ -85,6 +88,7 @@ public class KeyManager {
     public interface DbStrings {
         String KEY_VAULT_DB = "demo";
         String KEY_VAULT_COLLECTION = "__keyVault";
+        String REGULAR_DB = "encrypt-test";
         String MASTER_KEY_FILE_PATH = "master-key.txt";
         String KMS_PROVIDER_NAME = "local";
     }

@@ -4,7 +4,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Document("person")
+import static com.intentfilter.mongoencryptdemo.models.Person.Fields.CollectionName;
+
+@Document(CollectionName)
 public class Person {
     @Indexed(unique = true)
     @Field(Fields.Pan)
@@ -33,6 +35,7 @@ public class Person {
     }
 
     public interface Fields {
+        String CollectionName = "person";
         String Pan = "pan";
     }
 }
