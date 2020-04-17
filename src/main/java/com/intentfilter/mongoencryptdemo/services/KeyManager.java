@@ -83,7 +83,7 @@ public class KeyManager {
     }
 
     public interface DbStrings {
-        String KEY_VAULT_DB = "insertPersonAndQuery";
+        String KEY_VAULT_DB = "demo";
         String KEY_VAULT_COLLECTION = "__keyVault";
         String MASTER_KEY_FILE_PATH = "master-key.txt";
         String KMS_PROVIDER_NAME = "local";
